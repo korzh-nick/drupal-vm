@@ -31,6 +31,12 @@ To be able to search for docker images in podman, you need to add to the configu
     [registries.search]
     registries = ['docker.io']
 
+## Add podman to user's groups
+
+When running podman as rootless you need to add podman to the user's groups
+The best solution would be to add to the host config file /etc/containers/containers.conf:
+    `annotations=["run.oci.keep_original_groups=1",]`
+
 ## Method 1: Get a quick Drupal site installed with Drupal VM's Docker image
 
 If you just want a quick, easy Drupal site for testing, you can run an instance of Drupal VM and install Drupal inside using the provided script.
