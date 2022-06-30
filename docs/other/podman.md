@@ -1,12 +1,13 @@
-Drupal VM can be used with [Docker](https://www.docker.com) instead of or in addition to Vagrant:
+Drupal VM can be used with [Podman](https://podman.io/) instead of or in addition to Vagrant:
 
   - You can quickly install a Drupal site (any version) using the official [`geerlingguy/drupal-vm`](https://hub.docker.com/r/geerlingguy/drupal-vm/) image.
-  - You can build a customized local instance using Docker, pulling the official [`geerlingguy/drupal-vm`](https://hub.docker.com/r/geerlingguy/drupal-vm/) image.
+  - You can build a customized local instance using Podman, pulling the official [`geerlingguy/drupal-vm`](https://hub.docker.com/r/geerlingguy/drupal-vm/) image.
   - You can 'bake your own' customized Drupal VM Docker image and reuse it or share it with your team.
 
-> **Docker support is currently experimental**, so unless you're already familiar with Docker, it might be best to wait until later versions of Drupal VM are released with more stable support.
+> **Podman support is currently experimental**, so unless you're already familiar with Podman, it might be best to wait until later versions of Drupal VM are released with more stable support.
 
 ## Managing your hosts file
+// @TODO
 
 Before using Docker to run Drupal VM, you should [edit your hosts file](https://support.rackspace.com/how-to/modify-your-hosts-file/) and add the following line:
 
@@ -23,12 +24,19 @@ You can also add other subdomains if you're using other built-in services, e.g. 
 >
 > You'll have to create the alias again after restarting your Mac. See [this Docker (moby) issue](https://github.com/moby/moby/issues/22753#issuecomment-246054946) for more details.
 
+## Finding docker images in podman
+
+To be able to search for docker images in podman, you need to add to the configuration file `/etc/containers/registries.conf` of your linux host:
+
+    [registries.search]
+    registries = ['docker.io']
+
 ## Method 1: Get a quick Drupal site installed with Drupal VM's Docker image
 
 If you just want a quick, easy Drupal site for testing, you can run an instance of Drupal VM and install Drupal inside using the provided script.
 
-  1. Run an instance of Drupal VM: `docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 80:80 -p 443:443 --name=drupalvm --privileged geerlingguy/drupal-vm`
-  2. Install Drupal on this instance: `docker exec drupalvm install-drupal` (you can choose a version using `install-drupal [version]`, using versions like `9.x-dev` or `8.x-dev`).
+  1. Run an instance of Drupal VM: `podman run -d -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 80:80 -p 443:443 --name=drupalvm --privileged geerlingguy/drupal-vm`
+  2. Install Drupal on this instance: `podman exec drupalvm install-drupal` (you can choose a version using `install-drupal [version]`, using versions like `9.x-dev` or `8.x-dev`).
 
 You should be able to access the Drupal site at `http://localhost`. If you need to share a host directory into the VM, you can do so by adding another `-v` parameter, like `-v /path/on/host:/path/in/container.
 
@@ -36,9 +44,9 @@ If you only need a container to run your site, and you want to package up the co
 
     ```yaml
     version: "3"
-    
+
     services:
-    
+
       myproject:
         image: geerlingguy/drupal-vm
         container_name: myproject
@@ -53,17 +61,17 @@ If you only need a container to run your site, and you want to package up the co
         command: /lib/systemd/systemd
     ```
 
-Then, run `docker-compose up -d` to bring up the container.
+Then, run `podman-compose up -d` to bring up the container.
 
 For an example use of the simple approach for a contributed module's local development environment, see the Honeypot module, where this approach was added in [Add local test environment configuration](https://www.drupal.org/node/2885488).
 
-If you need more flexibility, though, you use one of the other Docker container methods on this page.
+If you need more flexibility, though, you use one of the other Podman container methods on this page.
 
-## Method 2: Build a default Drupal VM instance with Docker
+## Method 2: Build a default Drupal VM instance with Podman
 
 The [`geerlingguy/drupal-vm`](https://hub.docker.com/r/geerlingguy/drupal-vm/) image on Docker Hub contains a pre-built copy of Drupal VM, with all the latest Drupal VM defaults. If you need to quickly run your site in a container, or don't need to customize any of the components of Drupal VM, you can use this image.
 
-> For a reference installation that has configuration for running the local environment on _either_ Vagrant or Docker, see the [Drupal VM Live Site Repository](https://github.com/geerlingguy/drupalvm-live).
+> For a reference installation that has configuration for running the local environment on _either_ Vagrant or Podman, see the [Drupal VM Live Site Repository](https://github.com/geerlingguy/drupalvm-live).
 
 ### (Optional) Add a `Dockerfile` for customization
 
@@ -71,10 +79,10 @@ If you need to make small changes to the official `drupal-vm` image (instead of 
 
     FROM geerlingguy/drupal-vm:latest
     LABEL maintainer="Jeff Geerling"
-    
+
     # Install imagemagick.
     RUN apt-get install -y imagemagick
-    
+
     EXPOSE 80 443 3306 8025
 
 You can customize the official image in many other ways, but if you end up doing more than a step or two in a `Dockerfile`, it's probably a better idea to 'bake your own' Drupal VM Docker image.
@@ -91,30 +99,30 @@ You should also add a volume for MySQL data, otherwise MySQL may not start up co
 
 ### Run Drupal VM
 
-Run the command `docker-compose up -d` (the `-d` tells `docker-compose` to start the containers and run in the background).
+Run the command `podman-compose up -d` (the `-d` tells `podman-compose` to start the containers and run in the background).
 
 This command takes the instructions in the Docker Compose file and does two things:
 
-  1. Creates a custom Docker network that exposes Drupal VM on the IP address you have configured in `docker-compose.yml` (by default, `192.168.89.89`).
+  1. Creates a custom Docker network that exposes Drupal VM on the IP address you have configured in `docker-compose.yml` (by default, `192.168.89.89`). // @TODO
   2. Runs Drupal VM using the configuration in `docker-compose.yml`.
 
-After the Drupal VM container is running, you should be able to see the Dashboard page at the VM's IP address (e.g. `http://192.168.89.89`), and you should be able to access your site at the hostname you have configured in your hosts file (e.g. `http://drupalvm.test/`).
+After the Drupal VM container is running, you should be able to see the Dashboard page at the VM's IP address (e.g. `http://192.168.89.89`), and you should be able to access your site at the hostname you have configured in your hosts file (e.g. `http://drupalvm.test/`). // @TODO
 
 > Note: If you see Drupal's installer appear when accessing the site, that means the codebase was found, but either the database connection details are not in your local site configuration, or they are, but you don't have the default database populated yet. You may need to load in the database either via `drush sql-sync` or by importing a dump into the container. The default credentials are `drupal` and `drupal` for username and password, and `drupal` for the database name.
 
-You can stop the container with `docker-compose stop` (and start it again with `docker-compose start`), or remove all the configuration with `docker-compose down` (warning: this will also wipe out the database and other local container modifications).
+You can stop the container with `podman-compose stop` (and start it again with `podman-compose start`), or remove all the configuration with `podman-compose down` (warning: this will also wipe out the database and other local container modifications).
 
-### Using Drush inside Docker
+### Using Drush inside Podman
 
-Currently, the easiest way to use Drupal VM's `drush` inside a Docker container is to use `docker exec` to run `drush` internally. There are a few other ways you can try to get Drush working with a codebase running on a container, but the easiest way is to run a command like:
+Currently, the easiest way to use Drupal VM's `drush` inside a Podman container is to use `podman exec` to run `drush` internally. There are a few other ways you can try to get Drush working with a codebase running on a container, but the easiest way is to run a command like:
 
-    docker exec drupal-vm bash -c "drush --uri=drupalvm.test --root=/var/www/drupalvm/drupal/web status"
+    podman exec drupal-vm bash -c "drush --uri=drupalvm.test --root=/var/www/drupalvm/drupal/web status"
 
-## Method 3: 'Bake and Share' a custom Drupal VM Docker image
+## Method 3: 'Bake and Share' a custom Drupal VM Podman image
 
 If you need a more customized Drupal VM instance, it's best to build your own with Drupal VM's built-in Docker scripts.
 
-### Building ('baking') a Docker container with Drupal VM
+### Building ('baking') a Podman container with Drupal VM
 
 After you've configured your Drupal VM settings in `config.yml` and other configuration files, run the following command to create and provision a new Docker container:
 
@@ -138,7 +146,7 @@ Visit the Drupal VM dashboard: http://192.168.89.89:80
 
 Once the build is complete, you can view the dashboard by visiting the URL provided.
 
-### Saving the Docker container to an image
+### Saving the Podman container to an image
 
 If you are happy with the way the container was built, you can run the following command to convert the container into an image:
 
@@ -162,6 +170,6 @@ On someone else's computer (or your own, if you have deleted the existing `drupa
 
 Drupal VM includes an `example.docker-compose.yml` file. To use the file, copy it to `docker-compose.yml` and customize as you see fit, making sure to change the `image` to the value of `docker_image_name` (the default is `drupal-vm`). Once you've configured the exposed ports and settings as you like, run the following command to bring up the network and container(s) according to the compose file:
 
-    docker-compose up -d
+    podman-compose up -d
 
-(The `-d` tells `docker-compose` to start the containers and run in the background.) You can stop the container with `docker-compose stop` (and start it again with `docker-compose start`), or remove all the configuration with `docker-compose down` (warning: this will also wipe out the database and other local container modifications).
+(The `-d` tells `podman-compose` to start the containers and run in the background.) You can stop the container with `podman-compose stop` (and start it again with `podman-compose start`), or remove all the configuration with `podman-compose down` (warning: this will also wipe out the database and other local container modifications).
