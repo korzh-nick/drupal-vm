@@ -36,7 +36,7 @@ fi
 
 # Run the container.
 status "Bringing up Docker container..."
-docker run --name=$DRUPALVM_MACHINE_NAME -d \
+podman run --name=$DRUPALVM_MACHINE_NAME -d \
   --add-host "$DRUPALVM_HOSTNAME  drupalvm":127.0.0.1 \
   -v $PWD:$DRUPALVM_PROJECT_ROOT/:$volume_opts \
   -p $DRUPALVM_IP_ADDRESS:$DRUPALVM_HTTP_PORT:80 \
@@ -46,15 +46,15 @@ docker run --name=$DRUPALVM_MACHINE_NAME -d \
   $INIT
 
 # Create Drupal directory.
-docker exec $DRUPALVM_MACHINE_NAME mkdir -p $DRUPALVM_PROJECT_ROOT/drupal
+podman exec $DRUPALVM_MACHINE_NAME mkdir -p $DRUPALVM_PROJECT_ROOT/drupal
 
 # Set things up and run the Ansible playbook.
 status "Running setup playbook..."
-docker exec --tty $DRUPALVM_MACHINE_NAME env TERM=xterm \
+podman exec --tty $DRUPALVM_MACHINE_NAME env TERM=xterm \
   ansible-playbook $DRUPALVM_PROJECT_ROOT/tests/test-setup.yml
 
 status "Provisioning Drupal VM inside Docker container..."
-docker exec $DRUPALVM_MACHINE_NAME env TERM=xterm ANSIBLE_FORCE_COLOR=true \
+podman exec $DRUPALVM_MACHINE_NAME env TERM=xterm ANSIBLE_FORCE_COLOR=true \
   ansible-playbook $DRUPALVM_PROJECT_ROOT/provisioning/playbook.yml
 
 status "...done!"

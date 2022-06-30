@@ -37,6 +37,6 @@ image_full_path="${image_full_path/#\~/$HOME}" # Expand ~ to $HOME.
 
 # Save the image.
 printf "\n"${green}"Saving Docker container to $image_full_path..."${neutral}"\n"
-docker commit $container_name $image_name
-docker save $image_name | gzip -1 > $image_full_path
+podman commit $container_name $image_name
+podman save $image_name | gzip -1 > $image_full_path
 printf ${green}"...done!"${neutral}"\n"

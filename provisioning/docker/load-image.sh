@@ -34,5 +34,5 @@ image_full_path=${image_full_path/#\~/$HOME} # Expand ~ to $HOME.
 
 # Load the image.
 printf "\n"${green}"Loading Docker image..."${neutral}"\n"
-gunzip -c $image_full_path | docker load
+gunzip -c $image_full_path | podman load
 printf ${green}"...done!"${neutral}"\n"
