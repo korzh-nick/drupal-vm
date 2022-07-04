@@ -6,26 +6,6 @@ Drupal VM can be used with [Podman](https://podman.io/) instead of or in additio
 
 > **Podman support is currently experimental**, so unless you're already familiar with Podman, it might be best to wait until later versions of Drupal VM are released with more stable support.
 
-// @TODO
-<!--
-## Managing your hosts file
-
-Before using Docker to run Drupal VM, you should [edit your hosts file](https://support.rackspace.com/how-to/modify-your-hosts-file/) and add the following line:
-
-    192.168.89.89  drupalvm.test
-
-(Substitute the IP address and domain name you'd like to use to access your Drupal VM container.)
-
-You can also add other subdomains if you're using other built-in services, e.g. `adminer.drupalvm.test`, `xhprof.drupalvm.com`, etc.
-
-> If you're using Docker for Mac, you need to perform one additional step to ensure you can access Drupal VM using a unique IP address:
->
->   1. Add an alias IP address on the loopback interface: `sudo ifconfig lo0 alias 192.168.89.89/24`
->   2. When you're finished using the container, delete the alias: `sudo ifconfig lo0 -alias 192.168.89.89` (or restart your Mac).
->
-> You'll have to create the alias again after restarting your Mac. See [this Docker (moby) issue](https://github.com/moby/moby/issues/22753#issuecomment-246054946) for more details.
-
--->
 
 ## Finding docker images in podman
 
@@ -112,11 +92,8 @@ Run the command `podman-compose up -d` (the `-d` tells `podman-compose` to start
 
 This command takes the instructions in the Docker Compose file and does two things:
 
-<!--
-  1. Creates a custom Docker network that exposes Drupal VM on the IP address you have configured in `docker-compose.yml` (by default, `192.168.89.89`). --> // @TODO
-  2. Runs Drupal VM using the configuration in `docker-compose.yml`.
-<!--
-After the Drupal VM container is running, you should be able to see the Dashboard page at the VM's IP address (e.g. `http://192.168.89.89`), and you should be able to access your site at the hostname you have configured in your hosts file (e.g. `http://drupalvm.test/`). --> // @TODO
+  * Runs Drupal VM using the configuration in `docker-compose.yml`.
+
 
 > Note: If you see Drupal's installer appear when accessing the site, that means the codebase was found, but either the database connection details are not in your local site configuration, or they are, but you don't have the default database populated yet. You may need to load in the database either via `drush sql-sync` or by importing a dump into the container. The default credentials are `drupal` and `drupal` for username and password, and `drupal` for the database name.
 
